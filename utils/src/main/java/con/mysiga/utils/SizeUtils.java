@@ -50,7 +50,6 @@ public class SizeUtils {
         final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
         return (int) (spValue * fontScale + 0.5f);
     }
-
     /**
      * px转sp
      *
@@ -65,7 +64,7 @@ public class SizeUtils {
 
     /**
      * 各种单位转换
-     * <p>该方法存在于TypedValue</p>
+     * <p>该方法存在于{@link TypedValue}</p>
      *
      * @param unit    单位
      * @param value   值
@@ -73,21 +72,7 @@ public class SizeUtils {
      * @return 转换结果
      */
     public static float applyDimension(int unit, float value, DisplayMetrics metrics) {
-        switch (unit) {
-            case TypedValue.COMPLEX_UNIT_PX:
-                return value;
-            case TypedValue.COMPLEX_UNIT_DIP:
-                return value * metrics.density;
-            case TypedValue.COMPLEX_UNIT_SP:
-                return value * metrics.scaledDensity;
-            case TypedValue.COMPLEX_UNIT_PT:
-                return value * metrics.xdpi * (1.0f / 72);
-            case TypedValue.COMPLEX_UNIT_IN:
-                return value * metrics.xdpi;
-            case TypedValue.COMPLEX_UNIT_MM:
-                return value * metrics.xdpi * (1.0f / 25.4f);
-        }
-        return 0;
+        return TypedValue.applyDimension(unit,value,metrics);
     }
 
     /**

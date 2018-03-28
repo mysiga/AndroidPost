@@ -3,9 +3,9 @@ package con.mysiga.utils;
 /**
  * 常量相关工具类
  */
-public class ConstUtils {
+public class ConstantUtils {
 
-    private ConstUtils() {
+    private ConstantUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
 

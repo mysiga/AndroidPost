@@ -5,17 +5,17 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static con.mysiga.utils.ConstUtils.REGEX_DATE;
-import static con.mysiga.utils.ConstUtils.REGEX_EMAIL;
-import static con.mysiga.utils.ConstUtils.REGEX_ID_CARD15;
-import static con.mysiga.utils.ConstUtils.REGEX_ID_CARD18;
-import static con.mysiga.utils.ConstUtils.REGEX_IP;
-import static con.mysiga.utils.ConstUtils.REGEX_MOBILE_EXACT;
-import static con.mysiga.utils.ConstUtils.REGEX_MOBILE_SIMPLE;
-import static con.mysiga.utils.ConstUtils.REGEX_TEL;
-import static con.mysiga.utils.ConstUtils.REGEX_URL;
-import static con.mysiga.utils.ConstUtils.REGEX_USERNAME;
-import static con.mysiga.utils.ConstUtils.REGEX_ZH;
+import static con.mysiga.utils.ConstantUtils.REGEX_DATE;
+import static con.mysiga.utils.ConstantUtils.REGEX_EMAIL;
+import static con.mysiga.utils.ConstantUtils.REGEX_ID_CARD15;
+import static con.mysiga.utils.ConstantUtils.REGEX_ID_CARD18;
+import static con.mysiga.utils.ConstantUtils.REGEX_IP;
+import static con.mysiga.utils.ConstantUtils.REGEX_MOBILE_EXACT;
+import static con.mysiga.utils.ConstantUtils.REGEX_MOBILE_SIMPLE;
+import static con.mysiga.utils.ConstantUtils.REGEX_TEL;
+import static con.mysiga.utils.ConstantUtils.REGEX_URL;
+import static con.mysiga.utils.ConstantUtils.REGEX_USERNAME;
+import static con.mysiga.utils.ConstantUtils.REGEX_ZH;
 
 /**
  * 正则相关工具类

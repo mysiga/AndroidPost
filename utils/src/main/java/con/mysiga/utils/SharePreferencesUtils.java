@@ -6,12 +6,12 @@ import android.content.SharedPreferences;
 import java.util.Map;
 
 /**
- * SP相关工具类
+ * {@link SharedPreferences}相关工具类
  */
-public class SPUtils {
+public class SharePreferencesUtils {
 
-    private SharedPreferences sp;
-    private SharedPreferences.Editor editor;
+    private SharedPreferences mSharedPreferences;
+    private SharedPreferences.Editor mEditor;
 
     /**
      * SPUtils构造函数
@@ -20,10 +20,10 @@ public class SPUtils {
      * @param context 上下文
      * @param spName  spName
      */
-    public SPUtils(Context context, String spName) {
-        sp = context.getSharedPreferences(spName, Context.MODE_PRIVATE);
-        editor = sp.edit();
-        editor.apply();
+    public SharePreferencesUtils(Context context, String spName) {
+        mSharedPreferences = context.getSharedPreferences(spName, Context.MODE_PRIVATE);
+        mEditor = mSharedPreferences.edit();
+        mEditor.apply();
     }
 
     /**
@@ -33,7 +33,7 @@ public class SPUtils {
      * @param value 值
      */
     public void putString(String key, String value) {
-        editor.putString(key, value).apply();
+        mEditor.putString(key, value).apply();
     }
 
     /**
@@ -54,7 +54,7 @@ public class SPUtils {
      * @return 存在返回对应值，不存在返回默认值{@code defaultValue}
      */
     public String getString(String key, String defaultValue) {
-        return sp.getString(key, defaultValue);
+        return mSharedPreferences.getString(key, defaultValue);
     }
 
     /**
@@ -64,7 +64,7 @@ public class SPUtils {
      * @param value 值
      */
     public void putInt(String key, int value) {
-        editor.putInt(key, value).apply();
+        mEditor.putInt(key, value).apply();
     }
 
     /**
@@ -85,7 +85,7 @@ public class SPUtils {
      * @return 存在返回对应值，不存在返回默认值{@code defaultValue}
      */
     public int getInt(String key, int defaultValue) {
-        return sp.getInt(key, defaultValue);
+        return mSharedPreferences.getInt(key, defaultValue);
     }
 
     /**
@@ -95,7 +95,7 @@ public class SPUtils {
      * @param value 值
      */
     public void putLong(String key, long value) {
-        editor.putLong(key, value).apply();
+        mEditor.putLong(key, value).apply();
     }
 
     /**
@@ -116,7 +116,7 @@ public class SPUtils {
      * @return 存在返回对应值，不存在返回默认值{@code defaultValue}
      */
     public long getLong(String key, long defaultValue) {
-        return sp.getLong(key, defaultValue);
+        return mSharedPreferences.getLong(key, defaultValue);
     }
 
     /**
@@ -126,7 +126,7 @@ public class SPUtils {
      * @param value 值
      */
     public void putFloat(String key, float value) {
-        editor.putFloat(key, value).apply();
+        mEditor.putFloat(key, value).apply();
     }
 
     /**
@@ -147,7 +147,7 @@ public class SPUtils {
      * @return 存在返回对应值，不存在返回默认值{@code defaultValue}
      */
     public float getFloat(String key, float defaultValue) {
-        return sp.getFloat(key, defaultValue);
+        return mSharedPreferences.getFloat(key, defaultValue);
     }
 
     /**
@@ -157,7 +157,7 @@ public class SPUtils {
      * @param value 值
      */
     public void putBoolean(String key, boolean value) {
-        editor.putBoolean(key, value).apply();
+        mEditor.putBoolean(key, value).apply();
     }
 
     /**
@@ -178,7 +178,7 @@ public class SPUtils {
      * @return 存在返回对应值，不存在返回默认值{@code defaultValue}
      */
     public boolean getBoolean(String key, boolean defaultValue) {
-        return sp.getBoolean(key, defaultValue);
+        return mSharedPreferences.getBoolean(key, defaultValue);
     }
 
     /**
@@ -187,7 +187,7 @@ public class SPUtils {
      * @return Map对象
      */
     public Map<String, ?> getAll() {
-        return sp.getAll();
+        return mSharedPreferences.getAll();
     }
 
     /**
@@ -196,7 +196,7 @@ public class SPUtils {
      * @param key 键
      */
     public void remove(String key) {
-        editor.remove(key).apply();
+        mEditor.remove(key).apply();
     }
 
     /**
@@ -206,13 +206,13 @@ public class SPUtils {
      * @return {@code true}: 存在<br>{@code false}: 不存在
      */
     public boolean contains(String key) {
-        return sp.contains(key);
+        return mSharedPreferences.contains(key);
     }
 
     /**
      * SP中清除所有数据
      */
     public void clear() {
-        editor.clear().apply();
+        mEditor.clear().apply();
     }
 }

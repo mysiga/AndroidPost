@@ -13,6 +13,12 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [ moduleName : project.getName() ]
+            }
+        }
+
     }
 
     buildTypes {
@@ -31,10 +37,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-    compile project(':base')
-    compile project(':utils')
-    compile project(':widget')
-    compile project(':arouter')
-    compile project(':rxjava')
-    compile project(':http')
+    compile project(':gson')
+    compile "com.alibaba:arouter-api:${rootProject.ext.arouterApi}"
+    annotationProcessor "com.alibaba:arouter-compiler:${rootProject.ext.arouterProcessor}"
 }
