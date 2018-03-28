@@ -1,0 +1,11 @@
+/build
+/.idea
+/app/build
+/.gradle
+/app/app.iml
+/widget/widget.iml
+/local.properties
+*.iml
+gen/
+/app/app-release.apk
+app/libs/
