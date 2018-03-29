@@ -1,1 +1,1 @@
-include ':app', ':common', ':base', ':utils', ':widget', ':arouter', ':rxjava', ':gson', ':http'
+include ':app', ':common', ':base', ':utils', ':widget', ':arouter', ':rxjava', ':gson', ':http', ':share'

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:gravity="center"
+    android:orientation="vertical">
+
+
+    <TextView
+        android:id="@+id/share_title"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/height_48dp"
+        android:background="@color/white"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:paddingLeft="@dimen/margin_16dp"
+        android:paddingRight="@dimen/margin_16dp"
+        android:text="分享到"
+        android:textColor="@color/textColor_999"
+        android:visibility="visible" />
+
+    <View style="@style/default_divider" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="110dp"
+        android:gravity="center_vertical"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:id="@+id/wechat_session"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@drawable/icon_wechat_session"
+            android:gravity="center"
+            android:text="微信"
+            android:textColor="@color/textColor_999"
+            android:textSize="@dimen/textSize_14dp" />
+
+        <TextView
+            android:id="@+id/wechat_friend"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@drawable/icon_wechat_friend"
+            android:gravity="center"
+            android:text="朋友圈"
+            android:textColor="@color/textColor_999"
+            android:textSize="@dimen/textSize_14dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textColor="@color/textColor_999"
+            android:textSize="@dimen/textSize_14dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textColor="@color/textColor_999"
+            android:textSize="@dimen/textSize_14dp" />
+    </LinearLayout>
+
+    <View style="@style/default_divider" />
+
+</LinearLayout>
