@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -92,7 +93,7 @@ public class CrashUtils implements UncaughtExceptionHandler {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            CloseUtils.closeIO(pw);
+            closeIO(pw);
         }
         if (mHandler != null) {
             mHandler.uncaughtException(thread, throwable);
@@ -113,5 +114,22 @@ public class CrashUtils implements UncaughtExceptionHandler {
                 "\nApp VersionName    : " + versionName +
                 "\nApp VersionCode    : " + versionCode +
                 "\n************* Crash Log Head ****************\n\n";
+    }
+    /**
+     * 关闭IO
+     *
+     * @param closeables closeable
+     */
+    public static void closeIO(Closeable... closeables) {
+        if (closeables == null) return;
+        for (Closeable closeable : closeables) {
+            if (closeable != null) {
+                try {
+                    closeable.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

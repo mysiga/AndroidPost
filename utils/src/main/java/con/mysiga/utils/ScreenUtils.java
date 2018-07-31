@@ -138,7 +138,7 @@ public class ScreenUtils {
         view.setDrawingCacheEnabled(true);
         view.buildDrawingCache();
         Bitmap bmp = view.getDrawingCache();
-        int statusBarHeight = BarUtils.getStatusBarHeight(activity);
+        int statusBarHeight = getStatusBarHeight(activity);
         DisplayMetrics dm = new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
         Bitmap ret = Bitmap.createBitmap(bmp, 0, statusBarHeight, dm.widthPixels, dm.heightPixels - statusBarHeight);
@@ -156,5 +156,19 @@ public class ScreenUtils {
         KeyguardManager km = (KeyguardManager) context
                 .getSystemService(Context.KEYGUARD_SERVICE);
         return km.inKeyguardRestrictedInputMode();
+    }
+    /**
+     * 获取状态栏高度
+     *
+     * @param context context
+     * @return 状态栏高度
+     */
+    public static int getStatusBarHeight(Context context) {
+        int result = -1;
+        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = context.getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
     }
 }

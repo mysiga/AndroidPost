@@ -1,7 +1,10 @@
 package con.mysiga.utils;
 
+import android.text.TextUtils;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -113,7 +116,7 @@ public class ZipUtils {
         } finally {
             if (zos != null) {
                 zos.finish();
-                CloseUtils.closeIO(zos);
+                closeIO(zos);
             }
         }
     }
@@ -176,7 +179,7 @@ public class ZipUtils {
             return zipFile(resFile, "", zos, comment);
         } finally {
             if (zos != null) {
-                CloseUtils.closeIO(zos);
+                closeIO(zos);
             }
         }
     }
@@ -193,13 +196,13 @@ public class ZipUtils {
      */
     private static boolean zipFile(File resFile, String rootPath, ZipOutputStream zos, String comment)
             throws IOException {
-        rootPath = rootPath + (StringUtils.isSpace(rootPath) ? "" : File.separator) + resFile.getName();
+        rootPath = rootPath + (isSpace(rootPath) ? "" : File.separator) + resFile.getName();
         if (resFile.isDirectory()) {
             File[] fileList = resFile.listFiles();
             // 如果是空文件夹那么创建它，我把'/'换为File.separator测试就不成功，eggPain
             if (fileList == null || fileList.length <= 0) {
                 ZipEntry entry = new ZipEntry(rootPath + '/');
-                if (!StringUtils.isEmpty(comment)) entry.setComment(comment);
+                if (!TextUtils.isEmpty(comment)) entry.setComment(comment);
                 zos.putNextEntry(entry);
                 zos.closeEntry();
             } else {
@@ -213,7 +216,7 @@ public class ZipUtils {
             try {
                 is = new BufferedInputStream(new FileInputStream(resFile));
                 ZipEntry entry = new ZipEntry(rootPath);
-                if (!StringUtils.isEmpty(comment)) entry.setComment(comment);
+                if (!TextUtils.isEmpty(comment)) entry.setComment(comment);
                 zos.putNextEntry(entry);
                 byte buffer[] = new byte[KB];
                 int len;
@@ -222,7 +225,7 @@ public class ZipUtils {
                 }
                 zos.closeEntry();
             } finally {
-                CloseUtils.closeIO(is);
+                closeIO(is);
             }
         }
         return true;
@@ -317,7 +320,7 @@ public class ZipUtils {
         while (entries.hasMoreElements()) {
             ZipEntry entry = ((ZipEntry) entries.nextElement());
             String entryName = entry.getName();
-            if (StringUtils.isEmpty(keyword) || FileUtils.getFileName(entryName).toLowerCase().contains(keyword.toLowerCase())) {
+            if (TextUtils.isEmpty(keyword) || FileUtils.getFileName(entryName).toLowerCase().contains(keyword.toLowerCase())) {
                 String filePath = destDir + File.separator + entryName;
                 File file = new File(filePath);
                 files.add(file);
@@ -336,7 +339,7 @@ public class ZipUtils {
                             out.write(buffer, 0, len);
                         }
                     } finally {
-                        CloseUtils.closeIO(in, out);
+                        closeIO(in, out);
                     }
                 }
             }
@@ -428,5 +431,31 @@ public class ZipUtils {
             throws IOException {
         if (zipFile == null) return null;
         return new ZipFile(zipFile).entries();
+    }
+    /**
+     * 判断字符串是否为null或全为空格
+     *
+     * @param s 待校验字符串
+     * @return {@code true}: null或全空格<br> {@code false}: 不为null且不全空格
+     */
+    public static boolean isSpace(String s) {
+        return (s == null || s.trim().length() == 0);
+    }
+    /**
+     * 关闭IO
+     *
+     * @param closeables closeable
+     */
+    public static void closeIO(Closeable... closeables) {
+        if (closeables == null) return;
+        for (Closeable closeable : closeables) {
+            if (closeable != null) {
+                try {
+                    closeable.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

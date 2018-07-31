@@ -1,6 +1,7 @@
 package con.mysiga.utils;
 
 import android.content.Context;
+import android.os.Environment;
 
 import java.io.File;
 
@@ -77,7 +78,7 @@ public class CleanUtils {
      * @return {@code true}: 清除成功<br>{@code false}: 清除失败
      */
     public static boolean cleanExternalCache(Context context) {
-        return SDCardUtils.isSDCardEnable() && FileUtils.deleteFilesInDir(context.getExternalCacheDir());
+        return isSDCardEnable() && FileUtils.deleteFilesInDir(context.getExternalCacheDir());
     }
 
     /**
@@ -98,5 +99,47 @@ public class CleanUtils {
      */
     public static boolean cleanCustomCache(File dir) {
         return FileUtils.deleteFilesInDir(dir);
+    }
+    /**
+     * 清除App所有数据
+     *
+     * @param context  上下文
+     * @param dirPaths 目录路径
+     * @return {@code true}: 成功<br>{@code false}: 失败
+     */
+    public static boolean cleanAppData(Context context, String... dirPaths) {
+        File[] dirs = new File[dirPaths.length];
+        int i = 0;
+        for (String dirPath : dirPaths) {
+            dirs[i++] = new File(dirPath);
+        }
+        return cleanAppData(context, dirs);
+    }
+
+    /**
+     * 清除App所有数据
+     *
+     * @param context 上下文
+     * @param dirs    目录
+     * @return {@code true}: 成功<br>{@code false}: 失败
+     */
+    public static boolean cleanAppData(Context context, File... dirs) {
+        boolean isSuccess = cleanInternalCache(context);
+        isSuccess &= cleanInternalDbs(context);
+        isSuccess &= cleanInternalSP(context);
+        isSuccess &= cleanInternalFiles(context);
+        isSuccess &= cleanExternalCache(context);
+        for (File dir : dirs) {
+            isSuccess &= cleanCustomCache(dir);
+        }
+        return isSuccess;
+    }
+    /**
+     * 判断SD卡是否可用
+     *
+     * @return true : 可用<br>false : 不可用
+     */
+    public static boolean isSDCardEnable() {
+        return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
     }
 }

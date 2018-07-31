@@ -5,6 +5,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import java.io.BufferedWriter;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -297,7 +298,24 @@ public class LogUtils {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            CloseUtils.closeIO(bw);
+            closeIO(bw);
+        }
+    }
+    /**
+     * 关闭IO
+     *
+     * @param closeables closeable
+     */
+    public static void closeIO(Closeable... closeables) {
+        if (closeables == null) return;
+        for (Closeable closeable : closeables) {
+            if (closeable != null) {
+                try {
+                    closeable.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

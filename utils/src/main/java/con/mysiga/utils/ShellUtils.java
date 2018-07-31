@@ -1,7 +1,9 @@
 package con.mysiga.utils;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
@@ -118,7 +120,7 @@ public class ShellUtils {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            CloseUtils.closeIO(os, successResult, errorResult);
+            closeIO(os, successResult, errorResult);
             if (process != null) {
                 process.destroy();
             }
@@ -151,6 +153,23 @@ public class ShellUtils {
             this.result = result;
             this.successMsg = successMsg;
             this.errorMsg = errorMsg;
+        }
+    }
+    /**
+     * 关闭IO
+     *
+     * @param closeables closeable
+     */
+    public static void closeIO(Closeable... closeables) {
+        if (closeables == null) return;
+        for (Closeable closeable : closeables) {
+            if (closeable != null) {
+                try {
+                    closeable.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

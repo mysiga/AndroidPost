@@ -10,6 +10,7 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -68,7 +69,7 @@ public class LocationUtils {
         Location location;
         mListener = listener;
         if (!mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) && !mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            ToastUtils.showShortToastSafe(mContext, "无法定位，请打开定位服务");
+            Toast.makeText(mContext, "无法定位，请打开定位服务",Toast.LENGTH_SHORT).show();
             openGpsSettings();
         }
         if (mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {

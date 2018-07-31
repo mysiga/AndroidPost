@@ -36,19 +36,18 @@ public class CollectionUtils {
     }
 
     public static String listToString(List<String> list, String regex) {
-        if (NullUtils.isEmpty(list)) {
-            return null;
-        }
-
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0, size = list.size(); i < size; i++) {
-            String str = list.get(i);
-            sb.append(str);
-            //去除最后一位逗号
-            if (i != size - 1) {
-                sb.append(regex);
+        if (list != null && !list.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0, size = list.size(); i < size; i++) {
+                String str = list.get(i);
+                sb.append(str);
+                //去除最后一位逗号
+                if (i != size - 1) {
+                    sb.append(regex);
+                }
             }
+            return sb.toString();
         }
-        return sb.toString();
+        return null;
     }
 }

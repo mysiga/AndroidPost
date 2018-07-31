@@ -7,8 +7,11 @@ import android.os.StatFs;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Locale;
 
 /**
  * SD卡相关工具类
@@ -18,7 +21,30 @@ public class SDCardUtils {
     private SDCardUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
+    /******************** 存储相关常量 ********************/
+    /**
+     * Byte与Byte的倍数
+     */
+    public static final int BYTE = 1;
+    /**
+     * KB与Byte的倍数
+     */
+    public static final int KB = 1024;
+    /**
+     * MB与Byte的倍数
+     */
+    public static final int MB = 1048576;
+    /**
+     * GB与Byte的倍数
+     */
+    public static final int GB = 1073741824;
 
+    public enum MemoryUnit {
+        BYTE,
+        KB,
+        MB,
+        GB
+    }
     /**
      * 判断SD卡是否可用
      *
@@ -57,7 +83,7 @@ public class SDCardUtils {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            CloseUtils.closeIO(bufferedReader);
+            closeIO(bufferedReader);
         }
         return Environment.getExternalStorageDirectory().getPath() + File.separator;
     }
@@ -84,9 +110,28 @@ public class SDCardUtils {
         long blockSize, availableBlocks;
         availableBlocks = stat.getAvailableBlocksLong();
         blockSize = stat.getBlockSizeLong();
-        return ConvertUtils.byte2FitSize(availableBlocks * blockSize);
+        return byte2FitSize(availableBlocks * blockSize);
     }
-
+    /**
+     * 字节数转合适大小
+     * <p>保留3位小数</p>
+     *
+     * @param byteNum 字节数
+     * @return 1...1024 unit
+     */
+    public static String byte2FitSize(long byteNum) {
+        if (byteNum < 0) {
+            return "shouldn't be less than zero!";
+        } else if (byteNum < KB) {
+            return String.format(Locale.getDefault(), "%.3fB", (double) byteNum);
+        } else if (byteNum < MB) {
+            return String.format(Locale.getDefault(), "%.3fKB", (double) byteNum / KB);
+        } else if (byteNum < GB) {
+            return String.format(Locale.getDefault(), "%.3fMB", (double) byteNum / MB);
+        } else {
+            return String.format(Locale.getDefault(), "%.3fGB", (double) byteNum / GB);
+        }
+    }
     /**
      * 获取SD卡信息
      *
@@ -128,6 +173,23 @@ public class SDCardUtils {
                     "\ntotalBytes=" + totalBytes +
                     "\nfreeBytes=" + freeBytes +
                     "\navailableBytes=" + availableBytes;
+        }
+    }
+    /**
+     * 关闭IO
+     *
+     * @param closeables closeable
+     */
+    public static void closeIO(Closeable... closeables) {
+        if (closeables == null) return;
+        for (Closeable closeable : closeables) {
+            if (closeable != null) {
+                try {
+                    closeable.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

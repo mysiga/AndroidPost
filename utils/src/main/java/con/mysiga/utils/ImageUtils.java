@@ -19,6 +19,7 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.os.Build;
@@ -31,6 +32,7 @@ import android.view.View;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
@@ -56,8 +58,11 @@ public class ImageUtils {
      * @param format 格式
      * @return 字节数组
      */
-    public static byte[] bitmap2Bytes(Bitmap bitmap, CompressFormat format) {
-        return ConvertUtils.bitmap2Bytes(bitmap, format);
+    public static byte[] bitmap2Bytes(Bitmap bitmap, Bitmap.CompressFormat format) {
+        if (bitmap == null) return null;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(format, 100, baos);
+        return baos.toByteArray();
     }
 
     /**
@@ -67,7 +72,7 @@ public class ImageUtils {
      * @return bitmap
      */
     public static Bitmap bytes2Bitmap(byte[] bytes) {
-        return ConvertUtils.bytes2Bitmap(bytes);
+        return (bytes == null || bytes.length == 0) ? null : BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 
     /**
@@ -77,7 +82,7 @@ public class ImageUtils {
      * @return bitmap
      */
     public static Bitmap drawable2Bitmap(Drawable drawable) {
-        return ConvertUtils.drawable2Bitmap(drawable);
+        return drawable == null ? null : ((BitmapDrawable) drawable).getBitmap();
     }
 
     /**
@@ -88,7 +93,7 @@ public class ImageUtils {
      * @return drawable
      */
     public static Drawable bitmap2Drawable(Resources res, Bitmap bitmap) {
-        return ConvertUtils.bitmap2Drawable(res, bitmap);
+        return bitmap == null ? null : new BitmapDrawable(res, bitmap);
     }
 
     /**
@@ -98,8 +103,8 @@ public class ImageUtils {
      * @param format   格式
      * @return 字节数组
      */
-    public static byte[] drawable2Bytes(Drawable drawable, CompressFormat format) {
-        return ConvertUtils.drawable2Bytes(drawable, format);
+    public static byte[] drawable2Bytes(Drawable drawable, Bitmap.CompressFormat format) {
+        return drawable == null ? null : bitmap2Bytes(drawable2Bitmap(drawable), format);
     }
 
     /**
@@ -110,7 +115,7 @@ public class ImageUtils {
      * @return drawable
      */
     public static Drawable bytes2Drawable(Resources res, byte[] bytes) {
-        return ConvertUtils.bytes2Drawable(res, bytes);
+        return res == null ? null : bitmap2Drawable(res, bytes2Bitmap(bytes));
     }
 
     /**
@@ -120,7 +125,17 @@ public class ImageUtils {
      * @return bitmap
      */
     public static Bitmap view2Bitmap(View view) {
-        return ConvertUtils.view2Bitmap(view);
+        if (view == null) return null;
+        Bitmap ret = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(ret);
+        Drawable bgDrawable = view.getBackground();
+        if (bgDrawable != null) {
+            bgDrawable.draw(canvas);
+        } else {
+            canvas.drawColor(Color.WHITE);
+        }
+        view.draw(canvas);
+        return ret;
     }
 
     /**
@@ -158,7 +173,7 @@ public class ImageUtils {
             e.printStackTrace();
             return null;
         } finally {
-            CloseUtils.closeIO(is);
+            closeIO(is);
         }
     }
 
@@ -185,7 +200,7 @@ public class ImageUtils {
             e.printStackTrace();
             return null;
         } finally {
-            CloseUtils.closeIO(is);
+            closeIO(is);
         }
     }
 
@@ -196,7 +211,7 @@ public class ImageUtils {
      * @return bitmap
      */
     public static Bitmap getBitmap(String filePath) {
-        if (StringUtils.isSpace(filePath)) return null;
+        if (isSpace(filePath)) return null;
         return BitmapFactory.decodeFile(filePath);
     }
 
@@ -209,7 +224,7 @@ public class ImageUtils {
      * @return bitmap
      */
     public static Bitmap getBitmap(String filePath, int maxWidth, int maxHeight) {
-        if (StringUtils.isSpace(filePath)) return null;
+        if (isSpace(filePath)) return null;
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(filePath, options);
@@ -1204,7 +1219,7 @@ public class ImageUtils {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            CloseUtils.closeIO(os);
+            closeIO(os);
         }
         return ret;
     }
@@ -1258,7 +1273,7 @@ public class ImageUtils {
             e.printStackTrace();
             return null;
         } finally {
-            CloseUtils.closeIO(is);
+            closeIO(is);
         }
     }
 
@@ -1470,5 +1485,33 @@ public class ImageUtils {
         byte[] bytes = baos.toByteArray();
         if (recycle && !src.isRecycled()) src.recycle();
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+    }
+
+    /**
+     * 判断字符串是否为null或全为空格
+     *
+     * @param s 待校验字符串
+     * @return {@code true}: null或全空格<br> {@code false}: 不为null且不全空格
+     */
+    public static boolean isSpace(String s) {
+        return (s == null || s.trim().length() == 0);
+    }
+
+    /**
+     * 关闭IO
+     *
+     * @param closeables closeable
+     */
+    public static void closeIO(Closeable... closeables) {
+        if (closeables == null) return;
+        for (Closeable closeable : closeables) {
+            if (closeable != null) {
+                try {
+                    closeable.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

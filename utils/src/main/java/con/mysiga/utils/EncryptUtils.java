@@ -1,5 +1,8 @@
 package con.mysiga.utils;
 
+import android.util.Base64;
+
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -12,8 +15,6 @@ import java.security.SecureRandom;
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-
-import static con.mysiga.utils.ConvertUtils.bytes2HexString;
 
 /**
  * 加密解密相关的工具类
@@ -118,7 +119,7 @@ public class EncryptUtils {
      * @return 文件的16进制密文
      */
     public static String encryptMD5File2String(String filePath) {
-        File file = StringUtils.isSpace(filePath) ? null : new File(filePath);
+        File file = isSpace(filePath) ? null : new File(filePath);
         return encryptMD5File2String(file);
     }
 
@@ -129,7 +130,7 @@ public class EncryptUtils {
      * @return 文件的MD5校验码
      */
     public static byte[] encryptMD5File(String filePath) {
-        File file = StringUtils.isSpace(filePath) ? null : new File(filePath);
+        File file = isSpace(filePath) ? null : new File(filePath);
         return encryptMD5File(file);
     }
 
@@ -165,7 +166,7 @@ public class EncryptUtils {
             e.printStackTrace();
             return null;
         } finally {
-            CloseUtils.closeIO(fis);
+            closeIO(fis);
         }
     }
 
@@ -575,9 +576,17 @@ public class EncryptUtils {
      * @return Base64密文
      */
     public static byte[] encryptDES2Base64(byte[] data, byte[] key) {
-        return EncodeUtils.base64Encode(encryptDES(data, key));
+        return base64Encode(encryptDES(data, key));
     }
-
+    /**
+     * Base64编码
+     *
+     * @param input 要编码的字节数组
+     * @return Base64编码后的字符串
+     */
+    public static byte[] base64Encode(byte[] input) {
+        return Base64.encode(input, Base64.NO_WRAP);
+    }
     /**
      * DES加密后转为16进制
      *
@@ -608,9 +617,17 @@ public class EncryptUtils {
      * @return 明文
      */
     public static byte[] decryptBase64DES(byte[] data, byte[] key) {
-        return decryptDES(EncodeUtils.base64Decode(data), key);
+        return decryptDES(base64Decode(data), key);
     }
-
+    /**
+     * Base64解码
+     *
+     * @param input 要解码的字符串
+     * @return Base64解码后的字符串
+     */
+    public static byte[] base64Decode(byte[] input) {
+        return Base64.decode(input, Base64.NO_WRAP);
+    }
     /**
      * DES解密16进制密文
      *
@@ -652,7 +669,7 @@ public class EncryptUtils {
      * @return Base64密文
      */
     public static byte[] encrypt3DES2Base64(byte[] data, byte[] key) {
-        return EncodeUtils.base64Encode(encrypt3DES(data, key));
+        return base64Encode(encrypt3DES(data, key));
     }
 
     /**
@@ -685,7 +702,7 @@ public class EncryptUtils {
      * @return 明文
      */
     public static byte[] decryptBase64_3DES(byte[] data, byte[] key) {
-        return decrypt3DES(EncodeUtils.base64Decode(data), key);
+        return decrypt3DES(base64Decode(data), key);
     }
 
     /**
@@ -729,7 +746,7 @@ public class EncryptUtils {
      * @return Base64密文
      */
     public static byte[] encryptAES2Base64(byte[] data, byte[] key) {
-        return EncodeUtils.base64Encode(encryptAES(data, key));
+        return base64Encode(encryptAES(data, key));
     }
 
     /**
@@ -762,7 +779,7 @@ public class EncryptUtils {
      * @return 明文
      */
     public static byte[] decryptBase64AES(byte[] data, byte[] key) {
-        return decryptAES(EncodeUtils.base64Decode(data), key);
+        return decryptAES(base64Decode(data), key);
     }
 
     /**
@@ -820,7 +837,7 @@ public class EncryptUtils {
      * @return 字节数组
      */
     public static byte[] hexString2Bytes(String hexString) {
-        if (StringUtils.isSpace(hexString)) return null;
+        if (isSpace(hexString)) return null;
         int len = hexString.length();
         if (len % 2 != 0) {
             hexString = "0" + hexString;
@@ -867,5 +884,31 @@ public class EncryptUtils {
             ret[j++] = hexDigits[bytes[i] & 0x0f];
         }
         return new String(ret);
+    }
+    /**
+     * 判断字符串是否为null或全为空格
+     *
+     * @param s 待校验字符串
+     * @return {@code true}: null或全空格<br> {@code false}: 不为null且不全空格
+     */
+    public static boolean isSpace(String s) {
+        return (s == null || s.trim().length() == 0);
+    }
+    /**
+     * 关闭IO
+     *
+     * @param closeables closeable
+     */
+    public static void closeIO(Closeable... closeables) {
+        if (closeables == null) return;
+        for (Closeable closeable : closeables) {
+            if (closeable != null) {
+                try {
+                    closeable.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

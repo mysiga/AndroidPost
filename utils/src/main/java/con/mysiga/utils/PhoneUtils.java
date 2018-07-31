@@ -11,6 +11,7 @@ import android.os.SystemClock;
 import android.provider.Settings;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.Xml;
 
@@ -204,9 +205,9 @@ public class PhoneUtils {
      * @param content     短信内容
      */
     public static void sendSms(Context context, String phoneNumber, String content) {
-        Uri uri = Uri.parse("smsto:" + (StringUtils.isEmpty(phoneNumber) ? "" : phoneNumber));
+        Uri uri = Uri.parse("smsto:" + (TextUtils.isEmpty(phoneNumber) ? "" : phoneNumber));
         Intent intent = new Intent(Intent.ACTION_SENDTO, uri);
-        intent.putExtra("sms_body", StringUtils.isEmpty(content) ? "" : content);
+        intent.putExtra("sms_body", TextUtils.isEmpty(content) ? "" : content);
         context.startActivity(intent);
     }
 
@@ -219,7 +220,7 @@ public class PhoneUtils {
      * @param content     短信内容
      */
     public static void sendSmsSilent(Context context, String phoneNumber, String content) {
-        if (StringUtils.isEmpty(content)) return;
+        if (TextUtils.isEmpty(content)) return;
         PendingIntent sentIntent = PendingIntent.getBroadcast(context, 0, new Intent(), 0);
         SmsManager smsManager = SmsManager.getDefault();
         if (content.length() >= 70) {
@@ -262,7 +263,7 @@ public class PhoneUtils {
             // cursor.getString(cursor.getColumnIndex("contact_id"));//getColumnIndex
             // : 查询字段在cursor中索引值,一般都是用在查询字段比较多的时候
             // 判断contact_id是否为空
-            if (!StringUtils.isEmpty(contact_id)) {//null   ""
+            if (!TextUtils.isEmpty(contact_id)) {//null   ""
                 // 7.根据contact_id查询view_data表中的数据
                 // selection : 查询条件
                 // selectionArgs :查询条件的参数

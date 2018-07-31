@@ -4,6 +4,8 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -21,6 +23,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -33,6 +36,30 @@ public class FileUtils {
     private FileUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
+    /******************** 存储相关常量 ********************/
+    /**
+     * Byte与Byte的倍数
+     */
+    public static final int BYTE = 1;
+    /**
+     * KB与Byte的倍数
+     */
+    public static final int KB = 1024;
+    /**
+     * MB与Byte的倍数
+     */
+    public static final int MB = 1048576;
+    /**
+     * GB与Byte的倍数
+     */
+    public static final int GB = 1073741824;
+
+    public enum MemoryUnit {
+        BYTE,
+        KB,
+        MB,
+        GB
+    }
 
     /**
      * 根据文件路径获取文件
@@ -41,7 +68,7 @@ public class FileUtils {
      * @return 文件
      */
     public static File getFileByPath(String filePath) {
-        return StringUtils.isSpace(filePath) ? null : new File(filePath);
+        return isSpace(filePath) ? null : new File(filePath);
     }
 
     /**
@@ -88,7 +115,7 @@ public class FileUtils {
         // 文件不存在返回false
         if (!file.exists()) return false;
         // 新的文件名为空返回false
-        if (StringUtils.isSpace(newName)) return false;
+        if (isSpace(newName)) return false;
         // 如果文件名没有改变返回true
         if (newName.equals(file.getName())) return true;
         File newFile = new File(file.getParent() + File.separator + newName);
@@ -755,7 +782,7 @@ public class FileUtils {
             e.printStackTrace();
             return false;
         } finally {
-            CloseUtils.closeIO(is, os);
+            closeIO(is, os);
         }
     }
 
@@ -791,7 +818,7 @@ public class FileUtils {
             e.printStackTrace();
             return false;
         } finally {
-            CloseUtils.closeIO(bw);
+            closeIO(bw);
         }
     }
 
@@ -848,7 +875,7 @@ public class FileUtils {
             String line;
             int curLine = 1;
             List<String> list = new ArrayList<>();
-            if (StringUtils.isSpace(charsetName)) {
+            if (isSpace(charsetName)) {
                 reader = new BufferedReader(new FileReader(file));
             } else {
                 reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), charsetName));
@@ -863,7 +890,7 @@ public class FileUtils {
             e.printStackTrace();
             return null;
         } finally {
-            CloseUtils.closeIO(reader);
+            closeIO(reader);
         }
     }
 
@@ -890,7 +917,7 @@ public class FileUtils {
         BufferedReader reader = null;
         try {
             StringBuilder sb = new StringBuilder();
-            if (StringUtils.isSpace(charsetName)) {
+            if (isSpace(charsetName)) {
                 reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
             } else {
                 reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), charsetName));
@@ -905,7 +932,7 @@ public class FileUtils {
             e.printStackTrace();
             return null;
         } finally {
-            CloseUtils.closeIO(reader);
+            closeIO(reader);
         }
     }
 
@@ -928,10 +955,45 @@ public class FileUtils {
     public static byte[] readFile2Bytes(File file) {
         if (file == null) return null;
         try {
-            return ConvertUtils.inputStream2Bytes(new FileInputStream(file));
+            return inputStream2Bytes(new FileInputStream(file));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    /**
+     * inputStream转byteArr
+     *
+     * @param is 输入流
+     * @return 字节数组
+     */
+    public static byte[] inputStream2Bytes(InputStream is) {
+        if (is == null) return null;
+        return input2OutputStream(is).toByteArray();
+    }
+
+    /**
+     * inputStream转outputStream
+     *
+     * @param is 输入流
+     * @return outputStream子类
+     */
+    public static ByteArrayOutputStream input2OutputStream(InputStream is) {
+        if (is == null) return null;
+        try {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            byte[] b = new byte[KB];
+            int len;
+            while ((len = is.read(b, 0, KB)) != -1) {
+                os.write(b, 0, len);
+            }
+            return os;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            closeIO(is);
         }
     }
 
@@ -960,7 +1022,7 @@ public class FileUtils {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            CloseUtils.closeIO(is);
+            closeIO(is);
         }
         switch (p) {
             case 0xefbb:
@@ -1005,7 +1067,7 @@ public class FileUtils {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            CloseUtils.closeIO(is);
+            closeIO(is);
         }
         return count;
     }
@@ -1028,9 +1090,28 @@ public class FileUtils {
      */
     public static String getFileSize(File file) {
         if (!isFileExists(file)) return "";
-        return ConvertUtils.byte2FitSize(file.length());
+        return byte2FitSize(file.length());
     }
-
+    /**
+     * 字节数转合适大小
+     * <p>保留3位小数</p>
+     *
+     * @param byteNum 字节数
+     * @return 1...1024 unit
+     */
+    public static String byte2FitSize(long byteNum) {
+        if (byteNum < 0) {
+            return "shouldn't be less than zero!";
+        } else if (byteNum < KB) {
+            return String.format(Locale.getDefault(), "%.3fB", (double) byteNum);
+        } else if (byteNum < MB) {
+            return String.format(Locale.getDefault(), "%.3fKB", (double) byteNum / KB);
+        } else if (byteNum < GB) {
+            return String.format(Locale.getDefault(), "%.3fMB", (double) byteNum / MB);
+        } else {
+            return String.format(Locale.getDefault(), "%.3fGB", (double) byteNum / GB);
+        }
+    }
     /**
      * 获取文件的MD5校验码
      *
@@ -1038,7 +1119,7 @@ public class FileUtils {
      * @return 文件的MD5校验码
      */
     public static String getFileMD5ToString(String filePath) {
-        File file = StringUtils.isSpace(filePath) ? null : new File(filePath);
+        File file = isSpace(filePath) ? null : new File(filePath);
         return getFileMD5ToString(file);
     }
 
@@ -1049,7 +1130,7 @@ public class FileUtils {
      * @return 文件的MD5校验码
      */
     public static byte[] getFileMD5(String filePath) {
-        File file = StringUtils.isSpace(filePath) ? null : new File(filePath);
+        File file = isSpace(filePath) ? null : new File(filePath);
         return getFileMD5(file);
     }
 
@@ -1083,7 +1164,7 @@ public class FileUtils {
         } catch (NoSuchAlgorithmException | IOException e) {
             e.printStackTrace();
         } finally {
-            CloseUtils.closeIO(dis);
+            closeIO(dis);
         }
         return null;
     }
@@ -1106,7 +1187,7 @@ public class FileUtils {
      * @return filePath最长目录
      */
     public static String getDirName(String filePath) {
-        if (StringUtils.isSpace(filePath)) return filePath;
+        if (isSpace(filePath)) return filePath;
         int lastSep = filePath.lastIndexOf(File.separator);
         return lastSep == -1 ? "" : filePath.substring(0, lastSep + 1);
     }
@@ -1129,7 +1210,7 @@ public class FileUtils {
      * @return 文件名
      */
     public static String getFileName(String filePath) {
-        if (StringUtils.isSpace(filePath)) return filePath;
+        if (isSpace(filePath)) return filePath;
         int lastSep = filePath.lastIndexOf(File.separator);
         return lastSep == -1 ? filePath : filePath.substring(lastSep + 1);
     }
@@ -1152,7 +1233,7 @@ public class FileUtils {
      * @return 不带拓展名的文件名
      */
     public static String getFileNameNoExtension(String filePath) {
-        if (StringUtils.isSpace(filePath)) return filePath;
+        if (isSpace(filePath)) return filePath;
         int lastPoi = filePath.lastIndexOf('.');
         int lastSep = filePath.lastIndexOf(File.separator);
         if (lastSep == -1) {
@@ -1182,7 +1263,7 @@ public class FileUtils {
      * @return 文件拓展名
      */
     public static String getFileExtension(String filePath) {
-        if (StringUtils.isSpace(filePath)) return filePath;
+        if (isSpace(filePath)) return filePath;
         int lastPoi = filePath.lastIndexOf('.');
         int lastSep = filePath.lastIndexOf(File.separator);
         if (lastPoi == -1 || lastSep >= lastPoi) return "";
@@ -1207,5 +1288,33 @@ public class FileUtils {
             ret[j++] = hexDigits[bytes[i] & 0x0f];
         }
         return new String(ret);
+    }
+
+    /**
+     * 判断字符串是否为null或全为空格
+     *
+     * @param s 待校验字符串
+     * @return {@code true}: null或全空格<br> {@code false}: 不为null且不全空格
+     */
+    public static boolean isSpace(String s) {
+        return (s == null || s.trim().length() == 0);
+    }
+
+    /**
+     * 关闭IO
+     *
+     * @param closeables closeable
+     */
+    public static void closeIO(Closeable... closeables) {
+        if (closeables == null) return;
+        for (Closeable closeable : closeables) {
+            if (closeable != null) {
+                try {
+                    closeable.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

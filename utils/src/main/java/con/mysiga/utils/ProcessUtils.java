@@ -121,7 +121,7 @@ public class ProcessUtils {
      * @return {@code true}: 杀死成功<br>{@code false}: 杀死失败
      */
     public static boolean killBackgroundProcesses(Context context, String packageName) {
-        if (StringUtils.isSpace(packageName)) return false;
+        if (isSpace(packageName)) return false;
         ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningAppProcessInfo> infos = am.getRunningAppProcesses();
         if (infos == null || infos.size() == 0) return true;
@@ -138,5 +138,14 @@ public class ProcessUtils {
             }
         }
         return true;
+    }
+    /**
+     * 判断字符串是否为null或全为空格
+     *
+     * @param s 待校验字符串
+     * @return {@code true}: null或全空格<br> {@code false}: 不为null且不全空格
+     */
+    public static boolean isSpace(String s) {
+        return (s == null || s.trim().length() == 0);
     }
 }

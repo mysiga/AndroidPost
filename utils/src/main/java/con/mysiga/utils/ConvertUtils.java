@@ -12,6 +12,7 @@ import android.view.View;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -82,7 +83,7 @@ public class ConvertUtils {
      * @return 字节数组
      */
     public static byte[] hexString2Bytes(String hexString) {
-        if (StringUtils.isSpace(hexString)) return null;
+        if (isSpace(hexString)) return null;
         int len = hexString.length();
         if (len % 2 != 0) {
             hexString = "0" + hexString;
@@ -282,7 +283,7 @@ public class ConvertUtils {
             e.printStackTrace();
             return null;
         } finally {
-            CloseUtils.closeIO(is);
+            closeIO(is);
         }
     }
 
@@ -347,7 +348,7 @@ public class ConvertUtils {
             e.printStackTrace();
             return null;
         } finally {
-            CloseUtils.closeIO(os);
+            closeIO(os);
         }
     }
 
@@ -359,7 +360,7 @@ public class ConvertUtils {
      * @return 字符串
      */
     public static String inputStream2String(InputStream is, String charsetName) {
-        if (is == null || StringUtils.isSpace(charsetName)) return null;
+        if (is == null || isSpace(charsetName)) return null;
         try {
             return new String(inputStream2Bytes(is), charsetName);
         } catch (UnsupportedEncodingException e) {
@@ -376,7 +377,7 @@ public class ConvertUtils {
      * @return 输入流
      */
     public static InputStream string2InputStream(String string, String charsetName) {
-        if (string == null || StringUtils.isSpace(charsetName)) return null;
+        if (string == null || isSpace(charsetName)) return null;
         try {
             return new ByteArrayInputStream(string.getBytes(charsetName));
         } catch (UnsupportedEncodingException e) {
@@ -393,7 +394,7 @@ public class ConvertUtils {
      * @return 字符串
      */
     public static String outputStream2String(OutputStream out, String charsetName) {
-        if (out == null || StringUtils.isSpace(charsetName)) return null;
+        if (out == null || isSpace(charsetName)) return null;
         try {
             return new String(outputStream2Bytes(out), charsetName);
         } catch (UnsupportedEncodingException e) {
@@ -410,7 +411,7 @@ public class ConvertUtils {
      * @return 输入流
      */
     public static OutputStream string2OutputStream(String string, String charsetName) {
-        if (string == null || StringUtils.isSpace(charsetName)) return null;
+        if (string == null || isSpace(charsetName)) return null;
         try {
             return bytes2OutputStream(string.getBytes(charsetName));
         } catch (UnsupportedEncodingException e) {
@@ -552,5 +553,31 @@ public class ConvertUtils {
     public static int px2sp(Context context, float pxValue) {
         final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
         return (int) (pxValue / fontScale + 0.5f);
+    }
+    /**
+     * 判断字符串是否为null或全为空格
+     *
+     * @param s 待校验字符串
+     * @return {@code true}: null或全空格<br> {@code false}: 不为null且不全空格
+     */
+    public static boolean isSpace(String s) {
+        return (s == null || s.trim().length() == 0);
+    }
+    /**
+     * 关闭IO
+     *
+     * @param closeables closeable
+     */
+    public static void closeIO(Closeable... closeables) {
+        if (closeables == null) return;
+        for (Closeable closeable : closeables) {
+            if (closeable != null) {
+                try {
+                    closeable.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }
